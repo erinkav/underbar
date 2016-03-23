@@ -121,9 +121,14 @@
     for (var i=0; i<array.length; i++) {
       obj[i] = array[i];
     }
+
     return _.filter(array, function(item) {
-      for(var key in obj) {
-        return obj[key] !== item;
+      for (var key in obj) {
+        if(obj[key] === item) {
+          return false;
+        } else {
+          return true;
+        }
       }
     });
   };
@@ -239,6 +244,14 @@
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
 
+    return _.reduce(collection, function(isTrue, item){
+      if(!isTrue) {
+        return !!item;
+      } else if (isTrue) {
+        return true; //can't figure out why no matching test is failing. (isEven) shoul
+      }
+      return  !!isTrue;
+    }, false);
   };
 
 
@@ -260,13 +273,65 @@
   //   }, {
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
-  _.extend = function(obj) {
-    
+
+  _.extend = function(obj, properties) {
+      var args = Array.prototype.slice.call(arguments); 
+      for (var j = 0; j<args.length; j++) {
+          for (var val in args[j]) {
+          if(typeof args[j][val] === "object") {
+            for(var i in args[j][val]) {
+              (obj[val][i] = args[j][val][i]);
+            }
+          } else {
+            (obj[val] = args[j][val]);
+          }
+        }
+      }
+      return obj;
   };
+
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
-  _.defaults = function(obj) {
+  _.defaults = function(obj, properties) {
+      // for (var val in properties) {
+      //   if(val in properties) continue; 
+      //   else {
+      //     if(typeof properties[val] === "object") {
+      //       for(var i in properties[val]) {
+      //         if(i in properties[val]) {
+      //           obj[val][i] = properties[val][i];
+      //         }
+      //       }
+      //     } else {
+      //       obj[val] = properties[val];
+      //     }
+      //   }
+      // }
+      // return obj;
+    var args = Array.prototype.slice.call(arguments);
+    for (var i = 0; i< args.length; i++) {
+
+    }
+    // console.log(args); 
+    // for (var j = 0; j<args.length; j++) {
+    //   for(var val in args[j]) {
+    //     if(val in args[j])
+    //       continue;
+    //     else {
+    //       if(typeof args[j][val] === "object") {
+    //         for(var i in args[j][val]) {
+    //           if(i in args[j][val]) {
+    //             obj[val][i] = args[j][val][i];
+    //           }
+    //         }
+    //       } else {
+    //           obj[val] = args[j][val];
+    //       }
+    //     }
+    //   }
+    // }
+    return obj;
   };
 
 
@@ -309,7 +374,23 @@
   // _.memoize should return a function that, when called, will check if it has
   // already computed the result for the given argument and return that value
   // instead if possible.
+
+  
   _.memoize = function(func) {
+
+    var memo = {};
+    return function () {
+      var key = func.apply(this, arguments);
+      // if(typeof key !== "object") {
+      //   return (memo[key] === func.apply(this, arguments)); 
+      // } else 
+      //unsure of how to catch primitive values that have already been run before,
+      if (key in memo) {
+        return memo[key];
+      } else {
+        return (memo[key] = func.apply(this, arguments));
+      }
+    };
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -319,6 +400,7 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    return func.call(setTimeout(this, wait), arguments); 
   };
 
 
@@ -333,6 +415,11 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+    var arr = [];
+    for (var i = 0; i < array.length; i++) {
+      arr.splice(Math.random()*(array.length), 0, array[i]);
+    }
+    return arr; 
   };
 
 
@@ -369,6 +456,12 @@
   //
   // Hint: Use Array.isArray to check if something is an array
   _.flatten = function(nestedArray, result) {
+    var flat = [];
+    if(!Array.isArray(result)) {
+      for (var i = 0; i<nestedArray.length; i++) {
+
+      }
+    }
   };
 
   // Takes an arbitrary number of arrays and produces an array that contains
